@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<title>baffi Templates Example</title>
+	<script src="./baffi.js"></script>
+</head>
+<body>
+
+	<div id="tpl" style="visibility:hidden">
+		<h1>Template example v{{version}}</h1>
+		{{! My comment is awesome }}
+		<ol>
+			<li data-repeat="{{authors}}">
+				<span title="Age {{age}}" data-color="{{colors.name}}">{{fname}} {{lname}}</span> - {{phone}}
+				<br />
+				Kids: (for v{{version}})
+				<br />
+				<span data-repeat="{{kids}}">
+					{{name}}, Age {{age}} <small data-color="#999">(As of {{date}})</small>
+					<span data-if="{{school}}"> - attends {{school.name}}</span>
+					<br />
+				</span>
+			</li>
+		</ol>
+		<ol data-if="{{tags}}">
+			<li>Tags:</li>
+			<li data-repeat="{{tags}}">{{name}}</li>
+		</ol>
+		<p data-if-not="{{tags}}">No tags in data!</p>
+		<p data-if-not="{{books}}">No books in data!</p>
+		<p data-click-alert="{{greeting}}" data-color="{{colors.greeting}}">Click Me!</p>
+		<p data-if-not="{{is_experiment}}">Use this in production</p>
+		<p data-if="{{is_experiment}}">baffi: an experiment by <a href="{{credit.url}}">{{credit.name}}</a></p>
+	</div>
+
+	<script>
+		var data = {
+			version: '0.1.0',
+			credit: {
+				url: 'http://kendsnyder.com',
+				name: 'Ken Snyder'
+			},
+			is_experiment: true,
+			tags: [],
+			date: '12/13/2013',
+			greeting: 'Hello World',
+			colors: {
+				greeting: 'green',
+				name: 'blue'
+			},
+			authors: [
+				{
+					fname: "Bob",
+					lname: "Weiss",
+					phone: "1234",
+					age: "32",
+					kids: [
+						{
+							name: 'Zoe',
+							age: 3
+						},
+						{
+							name: 'Jonathan',
+							age: 6,
+							school: {
+								name: 'Midland Elementary'
+							}
+						}
+					]
+				},
+				{
+					fname: "Moe",
+					lname: "Sumpter",
+					phone: "5678",
+					age: "49",
+					kids: [
+						{
+							name: 'Samuel',
+							age: 10,
+							school: {
+								name: 'Jefferson Elementary'
+							}
+						},
+						{
+							name: 'Robert',
+							age: 13,
+							school: {
+								name: 'Washington Junior High'
+							}
+						},
+						{
+							name: 'Jennifer',
+							age: 19
+						}
+					]
+				}
+			]
+		};
+		// handle some custom attributes
+		baffi.addHandler('data-color', function(data, attrVal) {
+			this.style.color = baffi.injectData(data, attrVal);
+		});
+		baffi.addHandler('data-click-alert', function(data, attrVal) {
+			var value = baffi.injectData(data, attrVal);
+			this.onclick = function() {
+				alert('This is a custom handler called data-click-alert\nThe resolved value of the attribute is ' + value);
+			};
+		});
+		// run the template
+		baffi(document.getElementById('tpl'), data);
+		document.getElementById('tpl').style.visibility = 'visible';
+	</script>
+
+</body>
+</html>
